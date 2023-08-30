@@ -1,6 +1,7 @@
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-import Notiflix from 'notiflix';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import { Ukrainian } from 'flatpickr/dist/l10n/uk.js';
 
 const refs = {
   input: document.querySelector('input#datetime-picker'),
@@ -12,27 +13,41 @@ const refs = {
 };
 
 refs.startBtn.setAttribute('disabled', true);
+let intervalId = 0;
 
 const options = {
   enableTime: true,
   time_24hr: true,
   defaultDate: new Date(),
+  mode: 'single',
   minuteIncrement: 1,
-
+  locale: Ukrainian,
+  onOpen() {},
+  onChange() {
+    clearInterval(intervalId);
+    console.log('change', intervalId);
+    refs.days.textContent = addLeadingZero(0);
+    refs.hours.textContent = addLeadingZero(0);
+    refs.minutes.textContent = addLeadingZero(0);
+    refs.seconds.textContent = addLeadingZero(0);
+  },
   onClose(selectedDates) {
     if (selectedDates[0] - new Date() <= 0) {
       refs.startBtn.setAttribute('disabled', true);
-      window.alert('Please choose a date in the future');
+      Notify.failure('Please choose a date in the future', {
+        clickToClose: true,
+      });
       return;
     }
-
+    const targetTime = selectedDates[0];
     refs.startBtn.removeAttribute('disabled');
     refs.startBtn.addEventListener('click', onStartBtnClick);
 
     function onStartBtnClick() {
+      refs.startBtn.setAttribute('disabled', true);
       refs.startBtn.removeEventListener('click', onStartBtnClick);
-      const targetTime = selectedDates[0];
-      const intervalId = setInterval(() => {
+
+      intervalId = setInterval(() => {
         const currentTime = new Date();
         const timeleft = targetTime - currentTime;
         const convertedTime = convertMs(timeleft);
@@ -45,7 +60,9 @@ const options = {
           refs.startBtn.setAttribute('disabled', true);
         }
       }, 1000);
+      console.log('click', intervalId);
     }
+    console.log('close', intervalId);
   },
 };
 
