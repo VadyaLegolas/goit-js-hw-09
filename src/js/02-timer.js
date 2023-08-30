@@ -25,7 +25,6 @@ const options = {
   onOpen() {},
   onChange() {
     clearInterval(intervalId);
-    console.log('change', intervalId);
     refs.days.textContent = addLeadingZero(0);
     refs.hours.textContent = addLeadingZero(0);
     refs.minutes.textContent = addLeadingZero(0);
@@ -60,9 +59,9 @@ const options = {
           refs.startBtn.setAttribute('disabled', true);
         }
       }, 1000);
-      console.log('click', intervalId);
+      
     }
-    console.log('close', intervalId);
+    
   },
 };
 
